@@ -1,0 +1,45 @@
+model Question {
+  id         String  @id @default(uuid())
+  categoryId String?
+
+  title       String
+  description String
+
+  questionType QuestionType
+  difficulty   Difficulty
+  status       QuestionStatus
+
+  createdBy String
+  updatedBy String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category Category?     @relation(fields: [categoryId], references: [id])
+  tags     QuestionTag[]
+
+  @@index([categoryId])
+  @@index([difficulty])
+  @@index([questionType])
+  @@index([status])
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestionStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum QuestionType {
+  CODING
+  MCQ
+  DATABASE
+  SUBJECTIVE
+  FILE_UPLOAD
+}

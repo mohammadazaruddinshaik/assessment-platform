@@ -1,0 +1,23 @@
+model Tag {
+  id String @id @default(uuid())
+
+  name        String
+  description String?
+  status      TagStatus
+
+  createdBy String
+  updatedBy String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  questions QuestionTag[]
+
+  @@unique([name])
+  @@index([status])
+}
+
+enum TagStatus {
+  ACTIVE
+  INACTIVE
+}
