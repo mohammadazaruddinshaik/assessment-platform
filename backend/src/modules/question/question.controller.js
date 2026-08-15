@@ -52,9 +52,24 @@ const updateQuestion = async (req, res) => {
     );
 };
 
+
+const deleteQuestion = async (req, res) => {
+    await questionService.deleteQuestion(
+        req.validated.params.questionId
+    );
+
+    return ApiResponse.success(
+        res,
+        null,
+        "Question deleted successfully"
+    );
+};
+
+
 module.exports = {
     createQuestion,
     getQuestionById,
     listQuestions,
-    updateQuestion
+    updateQuestion,
+    deleteQuestion
 };

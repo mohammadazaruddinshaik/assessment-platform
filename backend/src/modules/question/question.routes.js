@@ -39,4 +39,11 @@ router.patch(
 );
 
 
+router.delete(
+    "/:questionId",
+    validate(questionIdSchema, "params"),
+    asyncHandler(questionController.deleteQuestion)
+);
+
+
 module.exports = router;

@@ -112,9 +112,28 @@ const updateQuestion = async (questionId, data) => {
     );
 };
 
+
+const deleteQuestion = async (questionId) => {
+    const existingQuestion =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!existingQuestion) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    await questionRepository.deleteQuestion(questionId);
+};
+
+
+
 module.exports = {
     createQuestion,
     getQuestionById,
     listQuestions,
-    updateQuestion
+    updateQuestion,
+    deleteQuestion
 };

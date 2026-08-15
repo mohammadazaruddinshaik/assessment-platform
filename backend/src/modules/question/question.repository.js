@@ -70,11 +70,18 @@ const updateQuestion = async (id, data) => {
     });
 };
 
+const deleteQuestion = async (id) => {
+    return prisma.question.delete({
+        where: { id }
+    });
+};
+
 
 
 module.exports = {
     createQuestion,
     findQuestionById,
     findQuestions,
-    updateQuestion
+    updateQuestion,
+    deleteQuestion
 };
