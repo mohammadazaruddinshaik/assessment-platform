@@ -20,7 +20,8 @@ const validate = (schema, source = "body") => {
             );
         }
 
-        req[source] = result.data;
+        req.validated = req.validated || {};
+        req.validated[source] = result.data;
 
         next();
     };
