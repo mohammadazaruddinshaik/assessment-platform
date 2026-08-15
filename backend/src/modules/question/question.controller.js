@@ -30,14 +30,12 @@ const listQuestions = async (req, res) => {
         req.validated.query
     );
 
-    return res.status(200).json({
-        success: true,
-        message: "Questions fetched successfully",
-        data: result.questions,
-        pagination: result.pagination
-    });
+    return ApiResponse.success(
+        res,
+        result,
+        "Questions fetched successfully"
+    );
 };
-
 
 const updateQuestion = async (req, res) => {
     const question = await questionService.updateQuestion(
@@ -65,11 +63,54 @@ const deleteQuestion = async (req, res) => {
     );
 };
 
+const addTagToQuestion = async (req, res) => {
+    const questionTag =
+        await questionService.addTagToQuestion(
+            req.validated.params.questionId,
+            req.validated.body.tagId
+        );
+
+    return ApiResponse.created(
+        res,
+        questionTag,
+        "Tag added to question successfully"
+    );
+};
+
+
+const getQuestionTags = async (req, res) => {
+    const tags = await questionService.getQuestionTags(
+        req.validated.params.questionId
+    );
+
+    return ApiResponse.success(
+        res,
+        tags,
+        "Question tags fetched successfully"
+    );
+};
+
+
+const removeTagFromQuestion = async (req, res) => {
+    await questionService.removeTagFromQuestion(
+        req.validated.params.questionId,
+        req.validated.params.tagId
+    );
+
+    return ApiResponse.success(
+        res,
+        null,
+        "Tag removed from question successfully"
+    );
+};
 
 module.exports = {
     createQuestion,
     getQuestionById,
     listQuestions,
     updateQuestion,
-    deleteQuestion
+    deleteQuestion,
+    addTagToQuestion,
+    getQuestionTags,
+    removeTagFromQuestion
 };

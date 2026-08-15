@@ -1,14 +1,11 @@
 model QuestionLanguage {
-  questionId String
-  languageId String
-
+  questionId  String
+  languageId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   starterCode String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  language    Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@id([questionId, languageId])
   @@index([languageId])

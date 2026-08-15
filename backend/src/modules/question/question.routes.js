@@ -8,7 +8,9 @@ const {
     createQuestionSchema,
     questionIdSchema,
     listQuestionsSchema,
-    updateQuestionSchema
+    updateQuestionSchema,
+    addQuestionTagSchema,
+    questionTagParamsSchema
 } = require("./question.validation");
 
 const router = express.Router();
@@ -24,6 +26,27 @@ router.get(
     validate(listQuestionsSchema, "query"),
     asyncHandler(questionController.listQuestions)
 );
+
+router.post(
+    "/:questionId/tags",
+    validate(questionIdSchema, "params"),
+    validate(addQuestionTagSchema, "body"),
+    asyncHandler(questionController.addTagToQuestion)
+);
+
+router.get(
+    "/:questionId/tags",
+    validate(questionIdSchema, "params"),
+    asyncHandler(questionController.getQuestionTags)
+);
+
+
+router.delete(
+    "/:questionId/tags/:tagId",
+    validate(questionTagParamsSchema, "params"),
+    asyncHandler(questionController.removeTagFromQuestion)
+);
+
 
 router.get(
     "/:questionId",

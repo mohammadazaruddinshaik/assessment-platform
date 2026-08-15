@@ -27,28 +27,28 @@ const createQuestionSchema = z.object({
         "DRAFT",
         "PUBLISHED",
         "ARCHIVED"
-    ]).default("DRAFT")
+    ]).default("DRAFT"),
+
+    tagIds: z.array(
+        z.string().uuid()
+    ).optional()
 });
 
 const questionIdSchema = z.object({
     questionId: z.string().uuid()
 });
 
+
 const listQuestionsSchema = z.object({
-    page: z.coerce
-        .number()
-        .int()
-        .min(1)
-        .default(1),
+    categoryId: z.string().uuid().optional(),
 
-    limit: z.coerce
-        .number()
-        .int()
-        .min(1)
-        .max(100)
-        .default(20),
+    tagId: z.string().uuid().optional(),
 
-    search: z.string().trim().optional(),
+    difficulty: z.enum([
+        "EASY",
+        "MEDIUM",
+        "HARD"
+    ]).optional(),
 
     questionType: z.enum([
         "CODING",
@@ -58,23 +58,18 @@ const listQuestionsSchema = z.object({
         "FILE_UPLOAD"
     ]).optional(),
 
-    difficulty: z.enum([
-        "EASY",
-        "MEDIUM",
-        "HARD"
-    ]).optional(),
-
     status: z.enum([
         "DRAFT",
         "PUBLISHED",
         "ARCHIVED"
     ]).optional(),
 
-    categoryId: z.string().uuid().optional(),
+    search: z.string().trim().min(1).max(100).optional(),
 
-    tagId: z.string().uuid().optional()
+    page: z.coerce.number().int().min(1).default(1),
+
+    limit: z.coerce.number().int().min(1).max(100).default(20)
 });
-
 
 
 const updateQuestionSchema = z
@@ -115,10 +110,22 @@ const updateQuestionSchema = z
     );
 
 
+const addQuestionTagSchema = z.object({
+    tagId: z.string().uuid()
+});
+
+
+const questionTagParamsSchema = z.object({
+    questionId: z.string().uuid(),
+    tagId: z.string().uuid()
+});
+
 
 module.exports = {
     createQuestionSchema,
     questionIdSchema,
     listQuestionsSchema,
-    updateQuestionSchema
+    updateQuestionSchema,
+    addQuestionTagSchema,
+    questionTagParamsSchema
 };

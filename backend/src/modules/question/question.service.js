@@ -1,7 +1,39 @@
 const ApiError = require("../../utils/api-error");
 const questionRepository = require("./question.repository");
+const tagRepository = require("../tag/tag.repository");
+const categoryRepository = require("../category/category.repository");
 
 const createQuestion = async (data) => {
+    if (data.categoryId) {
+        const category =
+            await categoryRepository.findCategoryById(
+                data.categoryId
+            );
+
+        if (!category) {
+            throw new ApiError(
+                404,
+                "Category not found",
+                "CATEGORY_NOT_FOUND"
+            );
+        }
+    }
+
+    if (data.tagIds?.length) {
+        for (const tagId of data.tagIds) {
+            const tag =
+                await tagRepository.findTagById(tagId);
+
+            if (!tag) {
+                throw new ApiError(
+                    404,
+                    "Tag not found",
+                    "TAG_NOT_FOUND"
+                );
+            }
+        }
+    }
+
     return questionRepository.createQuestion({
         ...data,
         createdBy: "system",
@@ -23,36 +55,20 @@ const getQuestionById = async (questionId) => {
     return question;
 };
 
-const listQuestions = async ({
-    page = 1,
-    limit = 20,
-    search,
-    questionType,
-    difficulty,
-    status,
-    categoryId,
-    tagId
-}) => {
+
+const listQuestions = async (filters) => {
+    const {
+        categoryId,
+        tagId,
+        difficulty,
+        questionType,
+        status,
+        search,
+        page,
+        limit
+    } = filters;
+
     const where = {};
-
-    if (search) {
-        where.title = {
-            contains: search,
-            mode: "insensitive"
-        };
-    }
-
-    if (questionType) {
-        where.questionType = questionType;
-    }
-
-    if (difficulty) {
-        where.difficulty = difficulty;
-    }
-
-    if (status) {
-        where.status = status;
-    }
 
     if (categoryId) {
         where.categoryId = categoryId;
@@ -66,26 +82,56 @@ const listQuestions = async ({
         };
     }
 
+    if (difficulty) {
+        where.difficulty = difficulty;
+    }
+
+    if (questionType) {
+        where.questionType = questionType;
+    }
+
+    if (status) {
+        where.status = status;
+    }
+
+    if (search) {
+        where.OR = [
+            {
+                title: {
+                    contains: search,
+                    mode: "insensitive"
+                }
+            },
+            {
+                description: {
+                    contains: search,
+                    mode: "insensitive"
+                }
+            },
+            {
+                constraints: {
+                    contains: search,
+                    mode: "insensitive"
+                }
+            }
+        ];
+    }
+
     const skip = (page - 1) * limit;
 
-    const { questions, total } =
-        await questionRepository.findQuestions({
-            where,
-            skip,
-            take: limit
-        });
+    const result = await questionRepository.findQuestions({
+        where,
+        skip,
+        take: limit
+    });
 
     return {
-        questions: questions.map((question) => ({
-            ...question,
-            tags: question.tags.map((item) => item.tag)
-        })),
-
+        items: result.questions,
         pagination: {
             page,
             limit,
-            total,
-            totalPages: Math.ceil(total / limit)
+            total: result.total,
+            totalPages: Math.ceil(result.total / limit)
         }
     };
 };
@@ -101,6 +147,21 @@ const updateQuestion = async (questionId, data) => {
             "Question not found",
             "QUESTION_NOT_FOUND"
         );
+    }
+
+    if (data.categoryId) {
+        const category =
+            await categoryRepository.findCategoryById(
+                data.categoryId
+            );
+
+        if (!category) {
+            throw new ApiError(
+                404,
+                "Category not found",
+                "CATEGORY_NOT_FOUND"
+            );
+        }
     }
 
     return questionRepository.updateQuestion(
@@ -128,6 +189,113 @@ const deleteQuestion = async (questionId) => {
     await questionRepository.deleteQuestion(questionId);
 };
 
+const addTagToQuestion = async (questionId, tagId) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    const tag =
+        await tagRepository.findTagById(tagId);
+
+    if (!tag) {
+        throw new ApiError(
+            404,
+            "Tag not found",
+            "TAG_NOT_FOUND"
+        );
+    }
+
+    const existingQuestionTag =
+        await questionRepository.findQuestionTag(
+            questionId,
+            tagId
+        );
+
+    if (existingQuestionTag) {
+        throw new ApiError(
+            409,
+            "Tag is already associated with this question",
+            "QUESTION_TAG_ALREADY_EXISTS"
+        );
+    }
+
+    return questionRepository.createQuestionTag(
+        questionId,
+        tagId
+    );
+};
+
+
+const getQuestionTags = async (questionId) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    const questionTags =
+        await questionRepository.findQuestionTags(questionId);
+
+    return questionTags.map((item) => item.tag);
+};
+
+
+const removeTagFromQuestion = async (questionId, tagId) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    const tag =
+        await tagRepository.findTagById(tagId);
+
+    if (!tag) {
+        throw new ApiError(
+            404,
+            "Tag not found",
+            "TAG_NOT_FOUND"
+        );
+    }
+
+    const questionTag =
+        await questionRepository.findQuestionTag(
+            questionId,
+            tagId
+        );
+
+    if (!questionTag) {
+        throw new ApiError(
+            404,
+            "Tag is not associated with this question",
+            "QUESTION_TAG_NOT_FOUND"
+        );
+    }
+
+    await questionRepository.deleteQuestionTag(
+        questionId,
+        tagId
+    );
+};
+
+
 
 
 module.exports = {
@@ -135,5 +303,8 @@ module.exports = {
     getQuestionById,
     listQuestions,
     updateQuestion,
-    deleteQuestion
+    deleteQuestion,
+    addTagToQuestion,
+    getQuestionTags,
+    removeTagFromQuestion
 };

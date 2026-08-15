@@ -1,19 +1,14 @@
 model Tag {
-  id String @id @default(uuid())
-
-  name        String
+  id          String        @id @default(uuid())
+  name        String        @unique
   description String?
   status      TagStatus
+  createdBy   String
+  updatedBy   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  questions   QuestionTag[]
 
-  createdBy String
-  updatedBy String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  questions QuestionTag[]
-
-  @@unique([name])
   @@index([status])
 }
 

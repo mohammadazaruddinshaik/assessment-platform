@@ -1,16 +1,12 @@
 model Language {
-  id String @id @default(uuid())
-
-  name String
-  code String @unique
-
-  status LanguageStatus
-
+  id        String             @id @default(uuid())
+  name      String
+  code      String             @unique
+  status    LanguageStatus
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
   questions QuestionLanguage[]
   runtimes  SandboxRuntime[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 enum LanguageStatus {

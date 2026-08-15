@@ -1,30 +1,24 @@
 model Question {
-  id         String  @id @default(uuid())
-  categoryId String?
-
-  title       String
-  description String
-  constraints String?
-
+  id           String                @id @default(uuid())
+  categoryId   String?
+  title        String
+  description  String
   questionType QuestionType
   difficulty   Difficulty
   status       QuestionStatus
-
-  languages    QuestionLanguage[]
-  testCases    TestCase[]
-  options      QuestionOption[]
+  createdBy    String
+  updatedBy    String
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  constraints  String?
   codingConfig CodingQuestionConfig?
   mcqConfig    MCQConfig?
-
-  createdBy String
-  updatedBy String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  category Category?       @relation(fields: [categoryId], references: [id])
-  tags     QuestionTag[]
-  media    QuestionMedia[]
+  category     Category?             @relation(fields: [categoryId], references: [id])
+  languages    QuestionLanguage[]
+  media        QuestionMedia[]
+  options      QuestionOption[]
+  tags         QuestionTag[]
+  testCases    TestCase[]
 
   @@index([categoryId])
   @@index([difficulty])
