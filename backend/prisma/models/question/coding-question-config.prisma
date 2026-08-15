@@ -1,0 +1,20 @@
+model CodingQuestionConfig {
+  id String @id @default(uuid())
+
+  questionId String @unique
+
+  executionMode CodingExecutionMode
+
+  timeLimitMs   Int
+  memoryLimitMb Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+enum CodingExecutionMode {
+  STDIN_STDOUT
+  FUNCTION
+}

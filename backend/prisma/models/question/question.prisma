@@ -4,10 +4,17 @@ model Question {
 
   title       String
   description String
+  constraints String?
 
   questionType QuestionType
   difficulty   Difficulty
   status       QuestionStatus
+
+  languages    QuestionLanguage[]
+  testCases    TestCase[]
+  options      QuestionOption[]
+  codingConfig CodingQuestionConfig?
+  mcqConfig    MCQConfig?
 
   createdBy String
   updatedBy String
@@ -15,8 +22,9 @@ model Question {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category Category?     @relation(fields: [categoryId], references: [id])
+  category Category?       @relation(fields: [categoryId], references: [id])
   tags     QuestionTag[]
+  media    QuestionMedia[]
 
   @@index([categoryId])
   @@index([difficulty])
@@ -39,7 +47,7 @@ enum QuestionStatus {
 enum QuestionType {
   CODING
   MCQ
-  DATABASE
+  SQL
   SUBJECTIVE
   FILE_UPLOAD
 }
