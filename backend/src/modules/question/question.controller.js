@@ -104,13 +104,79 @@ const removeTagFromQuestion = async (req, res) => {
     );
 };
 
+
+const addLanguageToQuestion = async (req, res) => {
+    const questionLanguage =
+        await questionService.addLanguageToQuestion(
+            req.validated.params.questionId,
+            req.validated.body
+        );
+
+    return ApiResponse.created(
+        res,
+        questionLanguage,
+        "Language added to question successfully"
+    );
+};
+
+
+const getQuestionLanguages = async (req, res) => {
+    const languages =
+        await questionService.getQuestionLanguages(
+            req.validated.params.questionId
+        );
+
+    return ApiResponse.success(
+        res,
+        languages,
+        "Question languages fetched successfully"
+    );
+};
+
+
+const updateQuestionLanguage = async (req, res) => {
+    const result =
+        await questionService.updateQuestionLanguage(
+            req.validated.params.questionId,
+            req.validated.params.languageId,
+            req.validated.body
+        );
+
+    return ApiResponse.success(
+        res,
+        result,
+        "Question language updated successfully"
+    );
+};
+
+const removeLanguageFromQuestion = async (req, res) => {
+    await questionService.removeLanguageFromQuestion(
+        req.validated.params.questionId,
+        req.validated.params.languageId
+    );
+
+    return ApiResponse.success(
+        res,
+        null,
+        "Language removed from question successfully"
+    );
+};
+
+
+
 module.exports = {
     createQuestion,
     getQuestionById,
     listQuestions,
     updateQuestion,
     deleteQuestion,
+
     addTagToQuestion,
     getQuestionTags,
-    removeTagFromQuestion
+    removeTagFromQuestion,
+
+    addLanguageToQuestion,
+    getQuestionLanguages,
+    updateQuestionLanguage,
+    removeLanguageFromQuestion
 };

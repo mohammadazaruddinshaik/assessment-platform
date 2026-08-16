@@ -10,7 +10,11 @@ const {
     listQuestionsSchema,
     updateQuestionSchema,
     addQuestionTagSchema,
-    questionTagParamsSchema
+    questionTagParamsSchema,
+    addQuestionLanguageSchema,
+    questionLanguageParamsSchema,
+    updateQuestionLanguageSchema,
+    
 } = require("./question.validation");
 
 const router = express.Router();
@@ -45,6 +49,34 @@ router.delete(
     "/:questionId/tags/:tagId",
     validate(questionTagParamsSchema, "params"),
     asyncHandler(questionController.removeTagFromQuestion)
+);
+
+router.post(
+    "/:questionId/languages",
+    validate(questionIdSchema, "params"),
+    validate(addQuestionLanguageSchema, "body"),
+    asyncHandler(questionController.addLanguageToQuestion)
+);
+
+
+router.get(
+    "/:questionId/languages",
+    validate(questionIdSchema, "params"),
+    asyncHandler(questionController.getQuestionLanguages)
+);
+
+
+router.patch(
+    "/:questionId/languages/:languageId",
+    validate(questionLanguageParamsSchema, "params"),
+    validate(updateQuestionLanguageSchema, "body"),
+    asyncHandler(questionController.updateQuestionLanguage)
+);
+
+router.delete(
+    "/:questionId/languages/:languageId",
+    validate(questionLanguageParamsSchema, "params"),
+    asyncHandler(questionController.removeLanguageFromQuestion)
 );
 
 

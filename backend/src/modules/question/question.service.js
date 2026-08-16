@@ -1,7 +1,9 @@
 const ApiError = require("../../utils/api-error");
+
 const questionRepository = require("./question.repository");
 const tagRepository = require("../tag/tag.repository");
 const categoryRepository = require("../category/category.repository");
+const languageRepository = require("../language/language.repository");
 
 const createQuestion = async (data) => {
     if (data.categoryId) {
@@ -29,6 +31,32 @@ const createQuestion = async (data) => {
                     404,
                     "Tag not found",
                     "TAG_NOT_FOUND"
+                );
+            }
+        }
+    }
+
+
+    if (data.languages?.length) {
+        for (const item of data.languages) {
+            const language =
+                await languageRepository.findLanguageById(
+                    item.languageId
+                );
+
+            if (!language) {
+                throw new ApiError(
+                    404,
+                    "Language not found",
+                    "LANGUAGE_NOT_FOUND"
+                );
+            }
+
+            if (language.status !== "ACTIVE") {
+                throw new ApiError(
+                    409,
+                    "Language is inactive",
+                    "LANGUAGE_NOT_ACTIVE"
                 );
             }
         }
@@ -136,7 +164,6 @@ const listQuestions = async (filters) => {
     };
 };
 
-
 const updateQuestion = async (questionId, data) => {
     const existingQuestion =
         await questionRepository.findQuestionById(questionId);
@@ -148,6 +175,10 @@ const updateQuestion = async (questionId, data) => {
             "QUESTION_NOT_FOUND"
         );
     }
+
+    // -----------------------------------------
+    // Validate category
+    // -----------------------------------------
 
     if (data.categoryId) {
         const category =
@@ -164,6 +195,54 @@ const updateQuestion = async (questionId, data) => {
         }
     }
 
+    // -----------------------------------------
+    // Validate tags
+    // -----------------------------------------
+
+    if (data.tagIds) {
+        for (const tagId of data.tagIds) {
+            const tag =
+                await tagRepository.findTagById(tagId);
+
+            if (!tag) {
+                throw new ApiError(
+                    404,
+                    "Tag not found",
+                    "TAG_NOT_FOUND"
+                );
+            }
+        }
+    }
+
+    // -----------------------------------------
+    // Validate languages
+    // -----------------------------------------
+
+    if (data.languages) {
+        for (const item of data.languages) {
+            const language =
+                await languageRepository.findLanguageById(
+                    item.languageId
+                );
+
+            if (!language) {
+                throw new ApiError(
+                    404,
+                    "Language not found",
+                    "LANGUAGE_NOT_FOUND"
+                );
+            }
+
+            if (language.status !== "ACTIVE") {
+                throw new ApiError(
+                    409,
+                    "Language is inactive",
+                    "LANGUAGE_NOT_ACTIVE"
+                );
+            }
+        }
+    }
+
     return questionRepository.updateQuestion(
         questionId,
         {
@@ -172,7 +251,6 @@ const updateQuestion = async (questionId, data) => {
         }
     );
 };
-
 
 const deleteQuestion = async (questionId) => {
     const existingQuestion =
@@ -296,6 +374,152 @@ const removeTagFromQuestion = async (questionId, tagId) => {
 };
 
 
+const addLanguageToQuestion = async (questionId, data) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    const language =
+        await questionRepository.findLanguageById(
+            data.languageId
+        );
+
+    if (!language) {
+        throw new ApiError(
+            404,
+            "Language not found",
+            "LANGUAGE_NOT_FOUND"
+        );
+    }
+
+    if (language.status !== "ACTIVE") {
+        throw new ApiError(
+            409,
+            "Language is inactive",
+            "LANGUAGE_NOT_ACTIVE"
+        );
+    }
+
+    const existingQuestionLanguage =
+        await questionRepository.findQuestionLanguage(
+            questionId,
+            data.languageId
+        );
+
+    if (existingQuestionLanguage) {
+        throw new ApiError(
+            409,
+            "Language is already associated with this question",
+            "QUESTION_LANGUAGE_ALREADY_EXISTS"
+        );
+    }
+
+    return questionRepository.createQuestionLanguage(
+        questionId,
+        data.languageId,
+        data.starterCode
+    );
+};
+
+
+const getQuestionLanguages = async (questionId) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    return questionRepository.findQuestionLanguages(
+        questionId
+    );
+};
+
+
+const updateQuestionLanguage = async (
+    questionId,
+    languageId,
+    data
+) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    const questionLanguage =
+        await questionRepository.findQuestionLanguage(
+            questionId,
+            languageId
+        );
+
+    if (!questionLanguage) {
+        throw new ApiError(
+            404,
+            "Language is not associated with this question",
+            "QUESTION_LANGUAGE_NOT_FOUND"
+        );
+    }
+
+    return questionRepository.updateQuestionLanguage(
+        questionId,
+        languageId,
+        data
+    );
+};
+
+
+const removeLanguageFromQuestion = async (
+    questionId,
+    languageId
+) => {
+    const question =
+        await questionRepository.findQuestionById(questionId);
+
+    if (!question) {
+        throw new ApiError(
+            404,
+            "Question not found",
+            "QUESTION_NOT_FOUND"
+        );
+    }
+
+    const questionLanguage =
+        await questionRepository.findQuestionLanguage(
+            questionId,
+            languageId
+        );
+
+    if (!questionLanguage) {
+        throw new ApiError(
+            404,
+            "Language is not associated with this question",
+            "QUESTION_LANGUAGE_NOT_FOUND"
+        );
+    }
+
+    await questionRepository.deleteQuestionLanguage(
+        questionId,
+        languageId
+    );
+};
+
 
 
 module.exports = {
@@ -304,7 +528,13 @@ module.exports = {
     listQuestions,
     updateQuestion,
     deleteQuestion,
+
     addTagToQuestion,
     getQuestionTags,
-    removeTagFromQuestion
+    removeTagFromQuestion,
+
+    getQuestionLanguages,
+    addLanguageToQuestion,
+    updateQuestionLanguage,
+    removeLanguageFromQuestion
 };

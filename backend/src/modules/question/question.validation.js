@@ -1,5 +1,18 @@
 const { z } = require("zod");
 
+
+const questionLanguageSchema = z.object({
+    languageId: z.string().uuid(),
+
+    starterCode: z
+        .string()
+        .max(10000)
+        .nullable()
+        .optional()
+});
+
+
+
 const createQuestionSchema = z.object({
     categoryId: z.string().uuid().optional(),
 
@@ -29,9 +42,16 @@ const createQuestionSchema = z.object({
         "ARCHIVED"
     ]).default("DRAFT"),
 
-    tagIds: z.array(
-        z.string().uuid()
-    ).optional()
+    tagIds: z
+        .array(z.string().uuid())
+        .optional()
+        .default([]),
+
+    languages: z
+        .array(questionLanguageSchema)
+        .optional()
+        .default([])
+
 });
 
 const questionIdSchema = z.object({
@@ -100,7 +120,15 @@ const updateQuestionSchema = z
             "DRAFT",
             "PUBLISHED",
             "ARCHIVED"
-        ]).optional()
+        ]).optional(),
+
+        tagIds: z
+            .array(z.string().uuid())
+            .optional(),
+
+        languages: z
+            .array(questionLanguageSchema)
+            .optional()
     })
     .refine(
         (data) => Object.keys(data).length > 0,
@@ -120,12 +148,40 @@ const questionTagParamsSchema = z.object({
     tagId: z.string().uuid()
 });
 
+const addQuestionLanguageSchema = z.object({
+    languageId: z.string().uuid(),
+
+    starterCode: z
+        .string()
+        .max(10000)
+        .optional()
+        .nullable()
+});
+
+
+const questionLanguageParamsSchema = z.object({
+    questionId: z.string().uuid(),
+    languageId: z.string().uuid()
+});
+
+const updateQuestionLanguageSchema = z.object({
+    starterCode: z.string().max(10000).nullable()
+});
+
+
+
 
 module.exports = {
     createQuestionSchema,
     questionIdSchema,
     listQuestionsSchema,
     updateQuestionSchema,
+    
     addQuestionTagSchema,
-    questionTagParamsSchema
+    questionTagParamsSchema,
+
+    addQuestionLanguageSchema,
+    questionLanguageParamsSchema,
+    updateQuestionLanguageSchema,
+    questionLanguageSchema
 };
