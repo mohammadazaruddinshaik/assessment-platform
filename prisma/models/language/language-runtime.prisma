@@ -1,0 +1,23 @@
+model SandboxRuntime {
+  id String @id @default(uuid())
+
+  languageId String
+
+  runtimeName    String
+  runtimeVersion String
+
+  status SandboxRuntimeStatus
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  language Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+
+  @@unique([languageId, runtimeVersion])
+  @@index([languageId])
+}
+
+enum SandboxRuntimeStatus {
+  ACTIVE
+  INACTIVE
+}

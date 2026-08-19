@@ -1,0 +1,24 @@
+model TestCase {
+  id String @id @default(uuid())
+
+  questionId String
+
+  input          String
+  expectedOutput String
+  explanation    String?
+
+  isSample Boolean @default(false)
+
+  points       Decimal @db.Decimal(8, 2)
+  displayOrder Int
+
+  media TestCaseMedia[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, displayOrder])
+  @@index([questionId])
+}
