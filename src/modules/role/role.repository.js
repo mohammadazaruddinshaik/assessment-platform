@@ -1,14 +1,11 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require("../../lib/prisma");
 
 
-
-const createRole = async (roleData) => {
-    return await prisma.role.create({
-        data: roleData,
+const createRole = async (tx, roleData) => {
+    return tx.role.create({
+        data: roleData
     });
 };
-
 
 const deleteRole = async (roleId) => {
     return await prisma.role.delete({

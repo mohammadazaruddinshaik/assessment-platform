@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const userRepository = require('./user.repository');
 const ApiError = require('../../utils/api-error');
 
-const createUser = async (userData, organizationId) => {
+const createUser = async (tx, userData, organizationId) => {
 
     const hashedPassword = await bcrypt.hash(
         userData.password,
@@ -14,35 +14,45 @@ const createUser = async (userData, organizationId) => {
         lastName: userData.lastName,
         email: userData.email,
         phone: userData.phone,
-        organizationId: organizationId,
+        organizationId,
         passwordHash: hashedPassword,
         status: userData.status || "ACTIVE"
     };
 
+    const user = await userRepository.createUser(
+        tx,
+        newUserPayload
+    );
+
+    await userRepository.createUserRole(
+        tx,
+        {
+            userId: user.id,
+            roleId: userData.roleId
+        }
+    );
+
+    await userRepository.createUserDepartment(
+        tx,
+        {
+            userId: user.id,
+            depId: userData.departmentId
+        }
+    );
+
+    return user;
+};
+
+const createUserWithTransaction = async (userData, organizationId) => {
+
     const createdUser = await prisma.$transaction(async (tx) => {
 
-        const user = await userRepository.createUser(
+        return createUser(
             tx,
-            newUserPayload
+            userData,
+            organizationId
         );
 
-        await userRepository.createUserRole(
-            tx,
-            {
-                userId: user.id,
-                roleId: userData.roleId
-            }
-        );
-
-        await userRepository.createUserDepartment(
-            tx,
-            {
-                userId: user.id,
-                depId: userData.departmentId
-            }
-        );
-
-        return user;
     });
 
     delete createdUser.passwordHash;
@@ -148,6 +158,7 @@ const deleteUser = async (userId) => {
 
 module.exports = {
     createUser,
+    createUserWithTransaction,
     getUserProfile,
     createUsersInBulk,
     updateUser,

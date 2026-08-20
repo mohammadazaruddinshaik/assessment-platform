@@ -10,7 +10,7 @@ const createUser = asyncHandler(async (req, res) => {
 
     const organizationId = req.user.organizationId;
 
-    const createdUser = await userService.createUser(
+    const createdUser = await userService.createUserWithTransaction(
         userData,
         organizationId
     );

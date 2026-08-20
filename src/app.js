@@ -4,6 +4,8 @@ const helmet = require("helmet");
 
 const routes = require("./routes");
 const errorMiddleware = require("./middlewares/error.middleware");
+const prisma = require("./lib/prisma");
+
 
 const app = express();
 
@@ -21,6 +23,20 @@ app.get("/health", (req, res) => {
         message: "Assessment Platform API is running"
     });
 });
+
+// const testDatabase = async () => {
+//     for (let i = 1; i <= 30; i++) {
+//         const start = performance.now();
+
+//         await prisma.$queryRaw`SELECT 1`;
+
+//         const time = performance.now() - start;
+
+//         console.log(`DB SELECT 1 #${i}: ${time.toFixed(2)} ms`);
+//     }
+// };
+
+// testDatabase();
 
 app.use(errorMiddleware);
 

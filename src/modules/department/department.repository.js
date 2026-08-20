@@ -1,32 +1,32 @@
 const prisma = require("../../lib/prisma");
 
-const createDepartment = (data) => {
-    return prisma.department.create({
-        data,
+const createDepartment = async (tx, departmentData) => {
+    return tx.department.create({
+        data: departmentData
     });
 };
 
-const getDepartmentById = (departmentId) => {
+const getDepartmentById = async (departmentId) => {
     return await prisma.department.findUnique({
         where: { id: departmentId },
     });
 };
 
-const updateDepartment = (departmentId, data) => {
-    return prisma.department.update({
+const updateDepartment = async (departmentId, data) => {
+    return await prisma.department.update({
         where: { id: departmentId },
         data,
     });
 };
 
-const deleteDepartment = (departmentId) => {
-    return prisma.department.delete({
+const deleteDepartment = async (departmentId) => {
+    return await prisma.department.delete({
         where: { id: departmentId },
     });
 };
 
-const listDepartments = () => {
-    return prisma.department.findMany();
+const listDepartments = async () => {
+    return await prisma.department.findMany();
 };
 
 

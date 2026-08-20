@@ -1,6 +1,4 @@
-// src/modules/user/user.repository.js
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require("../../lib/prisma");
 
 const createUser = async (db, userData) => {
     return db.user.create({
@@ -9,14 +7,44 @@ const createUser = async (db, userData) => {
 };
 
 const createUserRole = async (db, data) => {
+
     return db.userRole.create({
-        data
+        data: {
+            user: {
+                connect: {
+                    id: data.userId
+                }
+            },
+
+            role: {
+                connect: {
+                    id: data.roleId
+                }
+            },
+
+            assignedByUser: {
+                connect: {
+                    id: data.assignedByUserId
+                }
+            }
+        }
     });
 };
 
 const createUserDepartment = async (db, data) => {
-    return db.department.create({
-        data
+    return db.userDepartment.create({
+        data: {
+            departmentSection: {
+                connect: {
+                    id: data.depId
+                }
+            },
+            user: {
+                connect: {
+                    id: data.userId
+                }
+            }
+        }
     });
 };
 

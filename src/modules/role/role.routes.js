@@ -5,30 +5,39 @@ const roleController = require('./role.controller');
 const validate = require("../../middlewares/validation.middleware");
 const asyncHandler = require("../../utils/async-handler");
 
+const {
+    createRoleSchema,
+    getRoleByIdSchema,
+    updateRoleSchema,
+    deleteRoleSchema
+} = require('./role.validation');
+
 
 router.post(
     "/create",
-    validate(roleValidation.createRoleSchema),
+    validate(createRoleSchema),
     asyncHandler(roleController.createRole)
 );
 
 
 router.get(
     "/:id",
-    validate(roleValidation.getRoleByIdSchema),
+    validate(getRoleByIdSchema),
     asyncHandler(roleController.getRoleById)
 );
 
 
 router.patch(
     "/update/:id",
-    validate(roleValidation.updateRoleSchema),
+    validate(updateRoleSchema),
     asyncHandler(roleController.updateRole)
 );
 
 
 router.delete(
     "/delete/:id",
-    validate(roleValidation.deleteRoleSchema),
+    validate(deleteRoleSchema),
     asyncHandler(roleController.deleteRole)
 );
+
+module.exports = router;    

@@ -44,5 +44,6 @@ module.exports = {
     createUserSchema,
     bulkUserSchema,
     updateUserSchema,
-    deleteUserSchema
+    deleteUserSchema,
+    findUserByIdSchema
 };  

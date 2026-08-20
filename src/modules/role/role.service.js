@@ -9,8 +9,7 @@ const createRole = async (roleData) => {
 
     const newrolepayload = {
         name: roleData.name,
-        description: roleData.description,
-        codec: roleData.code
+        code: roleData.code
     }
 
     const createdRole = await rolerepository.createRole(newrolepayload);

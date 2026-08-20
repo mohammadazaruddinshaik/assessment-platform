@@ -1,17 +1,18 @@
 model Role {
-  id          String     @id @default(uuid())
-  code        String     @unique
-  name        String
-  description String?
-  status      RoleStatus @default(ACTIVE)
-  organizationId String    @map("organization_id")
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  id             String     @id @default(uuid())
+  code           String
+  name           String
+  description    String?
+  status         RoleStatus @default(ACTIVE)
+  organizationId String     @map("organization_id")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
 
-  userRoles UserRole[]
+  userRoles    UserRole[]
   organization Organization @relation(fields: [organizationId], references: [id])
 
-  @@index([code])
+  @@unique([organizationId, code])
+  @@index([organizationId])
   @@map("roles")
 }
 

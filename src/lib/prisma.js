@@ -9,4 +9,7 @@ const prisma = new PrismaClient({
     adapter
 });
 
+
+console.log("Prisma module initialized");
+
 module.exports = prisma;

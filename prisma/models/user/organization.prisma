@@ -13,9 +13,9 @@ model Organization {
   createdAt   DateTime           @default(now()) @map("created_at")
   updatedAt   DateTime           @updatedAt @map("updated_at")
 
-  users User[]
+  users       User[]
   departments Department[]
-  roles Role[]
+  roles       Role[]
 
   @@index([name])
   @@map("organization")

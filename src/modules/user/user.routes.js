@@ -9,37 +9,38 @@ const {
     createUserSchema,
     bulkUserSchema,
     updateUserSchema,
-    deleteUserSchema
+    deleteUserSchema,
+    findUserByIdSchema
     } = require('./user.validation');
 
 router.post(
     '/create', 
-    validate(userValidation.createUserSchema), 
+    validate(createUserSchema), 
     asyncHandler(userController.createUser)
 );
 
 
 router.post(
     '/create-bulk',
-    validate(userValidation.bulkUserSchema),
+    validate(bulkUserSchema),
     asyncHandler(userController.uploadBulkUsers)
 );
 
 router.get(
     '/:id', 
-    validate(userValidation.findUserByIdSchema),
+    validate(findUserByIdSchema),
     asyncHandler(userController.getUserById)
 );
 
 router.patch(
-    '/update-user/:id',
-    validate(userValidation.updateUserSchema),
+    '/update/:id',
+    validate(updateUserSchema),
     asyncHandler(userController.updateUser)
 );
 
 router.delete(
-    '/delete-user/:id',
-    validate(userValidation.deleteUserSchema),
+    '/delete/:id',
+    validate(deleteUserSchema),
     asyncHandler(userController.deleteUser)
 );
 
