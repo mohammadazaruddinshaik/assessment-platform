@@ -1,0 +1,27 @@
+model Organization {
+  id          String             @id @default(uuid())
+  name        String
+  displayName String?            @map("display_name")
+  description String?
+  email       String?
+  phone       String?
+  website     String?
+  logoUrl     String?            @map("logo_url")
+  address     String?
+  timezone    String?
+  status      OrganizationStatus @default(ACTIVE)
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+
+  users       User[]
+  departments Department[]
+  roles       Role[]
+
+  @@index([name])
+  @@map("organization")
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+}

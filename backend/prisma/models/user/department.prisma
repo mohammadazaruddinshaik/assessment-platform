@@ -1,0 +1,13 @@
+model Department {
+  id             String @id @default(uuid())
+  departmentName String @map("department_name")
+  organizationId String @map("organization_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  departments  UserDepartment[]
+  organization Organization     @relation(fields: [organizationId], references: [id])
+
+  @@map("department_section")
+}

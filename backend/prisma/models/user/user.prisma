@@ -1,0 +1,44 @@
+model User {
+  id String @id @default(uuid())
+
+  firstName String @map("first_name")
+
+  lastName String @map("last_name")
+
+  email String @unique
+
+  phone String?
+
+  organizationId String @map("organization_id")
+
+  passwordHash String @map("password_hash")
+
+  profileImageUrl String? @map("profile_image_url")
+
+  status UserStatus @default(ACTIVE)
+
+  lastLoginAt DateTime? @map("last_login_at")
+
+  emailVerifiedAt DateTime? @map("email_verified_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userRoles UserRole[] @relation("UserRoles")
+
+  assignedRoles UserRole[] @relation("AssignedRoles")
+
+  departments UserDepartment[]
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([id])
+  @@map("users")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  LOCKED
+}
