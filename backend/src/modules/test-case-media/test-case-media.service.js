@@ -7,7 +7,8 @@ const testCaseRepository =
     require("../test-case/test-case.repository");
 
 const {
-    uploadImage
+    uploadImage,
+    deleteImage
 } = require("../../utils/cloudinary-upload");
 
 
@@ -73,6 +74,7 @@ const createTestCaseMedia = async (
 
 
     let mediaUrl = data.url;
+    let publicId = null;
 
 
     // Upload file to Cloudinary
@@ -82,6 +84,7 @@ const createTestCaseMedia = async (
                 await uploadImage(file);
 
             mediaUrl = uploaded.url;
+            publicId = uploaded.publicId;
         } catch (error) {
             throw new ApiError(
                 500,
@@ -97,6 +100,7 @@ const createTestCaseMedia = async (
         {
             type: data.type,
             url: mediaUrl,
+            publicId,
             altText: data.altText,
             displayOrder: data.displayOrder
         }
@@ -253,19 +257,48 @@ const updateTestCaseMedia = async (
     };
 
 
-    // If a new file is provided, upload it
+    // Replace with a newly uploaded file
     if (file) {
-        try {
-            const uploaded =
-                await uploadImage(file);
+        let uploaded;
 
-            updateData.url = uploaded.url;
+        try {
+            uploaded = await uploadImage(file);
         } catch (error) {
             throw new ApiError(
                 500,
                 "Failed to upload media",
                 "MEDIA_UPLOAD_FAILED"
             );
+        }
+
+        updateData.url = uploaded.url;
+        updateData.publicId = uploaded.publicId;
+
+        // Remove old Cloudinary image
+        if (existingMedia.publicId) {
+            try {
+                await deleteImage(
+                    existingMedia.publicId
+                );
+            } catch (error) {
+                // New file was successfully uploaded,
+                // so don't fail the update because cleanup failed.
+                // The old file may need later cleanup.
+            }
+        }
+    }
+
+
+    // Switching from Cloudinary image to external URL
+    if (data.url && existingMedia.publicId) {
+        updateData.publicId = null;
+
+        try {
+            await deleteImage(
+                existingMedia.publicId
+            );
+        } catch (error) {
+            // Continue with DB update
         }
     }
 
@@ -313,6 +346,23 @@ const deleteTestCaseMedia = async (
             "Test case media not found",
             "TEST_CASE_MEDIA_NOT_FOUND"
         );
+    }
+
+
+    // Delete from Cloudinary only if this media
+    // was uploaded by our application
+    if (existingMedia.publicId) {
+        try {
+            await deleteImage(
+                existingMedia.publicId
+            );
+        } catch (error) {
+            throw new ApiError(
+                500,
+                "Failed to delete media from Cloudinary",
+                "MEDIA_DELETE_FAILED"
+            );
+        }
     }
 
 

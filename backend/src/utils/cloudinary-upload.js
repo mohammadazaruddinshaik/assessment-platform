@@ -26,6 +26,14 @@ const uploadImage = (file) => {
 };
 
 
+const deleteImage = async (publicId) => {
+    return cloudinary.uploader.destroy(publicId, {
+        resource_type: "image"
+    });
+};
+
+
 module.exports = {
-    uploadImage
+    uploadImage,
+    deleteImage
 };

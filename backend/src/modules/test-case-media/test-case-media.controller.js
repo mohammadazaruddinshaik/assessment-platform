@@ -6,6 +6,24 @@ const ApiResponse =
 
 
 const createTestCaseMedia = async (req, res) => {
+    console.log("REQ.BODY:", req.body);
+
+    console.log(
+        "REQ.FILE:",
+        req.file
+            ? {
+                originalname: req.file.originalname,
+                mimetype: req.file.mimetype,
+                size: req.file.size
+            }
+            : null
+    );
+
+    console.log(
+        "VALIDATED BODY:",
+        req.validated.body
+    );
+
     const media =
         await testCaseMediaService.createTestCaseMedia(
             req.validated.params.testCaseId,
@@ -19,7 +37,6 @@ const createTestCaseMedia = async (req, res) => {
         "Test case media created successfully"
     );
 };
-
 
 const getTestCaseMediaById = async (req, res) => {
     const media =

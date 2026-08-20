@@ -11,12 +11,12 @@ const create = async (testCaseId, data) => {
             testCaseId,
             type: data.type,
             url: data.url,
+            publicId: data.publicId,
             altText: data.altText,
             displayOrder: data.displayOrder
         }
     });
 };
-
 
 // =====================================================
 // FIND BY ID
