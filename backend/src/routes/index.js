@@ -21,11 +21,17 @@ const testCaseRoutes =
 const testCaseMediaRoutes =
     require("../modules/test-case-media/test-case-media.routes");
 
+
+const codingQuestionConfigRoutes =
+    require("../modules/coding-question-config/coding-question-config.routes");
+
 const router = express.Router();
 
 router.use("/questions", questionRoutes);
 
 router.use("/questions", questionMediaRoutes);
+
+router.use("/questions", codingQuestionConfigRoutes);
 
 router.use("/categories", categoryRoutes);
 
