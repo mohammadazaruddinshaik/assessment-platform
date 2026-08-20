@@ -1,12 +1,15 @@
 const cloudinary = require("../config/cloudinary");
 
 
-const uploadImage = (file) => {
+const uploadImage = (
+    file,
+    folder = "assessment-platform/test-case-media"
+) => {
     return new Promise((resolve, reject) => {
         const uploadStream =
             cloudinary.uploader.upload_stream(
                 {
-                    folder: "assessment-platform/test-case-media",
+                    folder,
                     resource_type: "image"
                 },
                 (error, result) => {
@@ -27,9 +30,12 @@ const uploadImage = (file) => {
 
 
 const deleteImage = async (publicId) => {
-    return cloudinary.uploader.destroy(publicId, {
-        resource_type: "image"
-    });
+    return cloudinary.uploader.destroy(
+        publicId,
+        {
+            resource_type: "image"
+        }
+    );
 };
 
 

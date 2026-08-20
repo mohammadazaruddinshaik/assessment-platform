@@ -1,10 +1,10 @@
 const ApiError = require("../../utils/api-error");
 
-const testCaseMediaRepository =
-    require("./test-case-media.repository");
+const questionMediaRepository =
+    require("./question-media.repository");
 
-const testCaseRepository =
-    require("../test-case/test-case.repository");
+const questionRepository =
+    require("../question/question.repository");
 
 const {
     uploadImage,
@@ -16,22 +16,22 @@ const {
 // CREATE MEDIA
 // =====================================================
 
-const createTestCaseMedia = async (
-    testCaseId,
+const createQuestionMedia = async (
+    questionId,
     data,
     file
 ) => {
-    // Check TestCase exists
-    const testCase =
-        await testCaseRepository.findById(
-            testCaseId
+    // Check Question exists
+    const question =
+        await questionRepository.findQuestionById(
+            questionId
         );
 
-    if (!testCase) {
+    if (!question) {
         throw new ApiError(
             404,
-            "Test case not found",
-            "TEST_CASE_NOT_FOUND"
+            "Question not found",
+            "QUESTION_NOT_FOUND"
         );
     }
 
@@ -58,9 +58,9 @@ const createTestCaseMedia = async (
 
     // Check displayOrder
     const existingMedia =
-        await testCaseMediaRepository
-            .findByTestCaseAndDisplayOrder(
-                testCaseId,
+        await questionMediaRepository
+            .findByQuestionAndDisplayOrder(
+                questionId,
                 data.displayOrder
             );
 
@@ -68,7 +68,7 @@ const createTestCaseMedia = async (
         throw new ApiError(
             409,
             "Display order is already used by another media item",
-            "TEST_CASE_MEDIA_DISPLAY_ORDER_EXISTS"
+            "QUESTION_MEDIA_DISPLAY_ORDER_EXISTS"
         );
     }
 
@@ -81,10 +81,10 @@ const createTestCaseMedia = async (
     if (file) {
         try {
             const uploaded =
-                    await uploadImage(
-                        file,
-                        "assessment-platform/test-case-media"
-                    );
+                await uploadImage(
+                    file,
+                    "assessment-platform/question-media"
+                );
 
             mediaUrl = uploaded.url;
             publicId = uploaded.publicId;
@@ -98,8 +98,8 @@ const createTestCaseMedia = async (
     }
 
 
-    return testCaseMediaRepository.create(
-        testCaseId,
+    return questionMediaRepository.create(
+        questionId,
         {
             type: data.type,
             url: mediaUrl,
@@ -115,37 +115,37 @@ const createTestCaseMedia = async (
 // GET MEDIA BY ID
 // =====================================================
 
-const getTestCaseMediaById = async (
-    testCaseId,
+const getQuestionMediaById = async (
+    questionId,
     mediaId
 ) => {
-    const testCase =
-        await testCaseRepository.findById(
-            testCaseId
+    const question =
+        await questionRepository.findQuestionById(
+            questionId
         );
 
-    if (!testCase) {
+    if (!question) {
         throw new ApiError(
             404,
-            "Test case not found",
-            "TEST_CASE_NOT_FOUND"
+            "Question not found",
+            "QUESTION_NOT_FOUND"
         );
     }
 
 
     const media =
-        await testCaseMediaRepository.findById(
+        await questionMediaRepository.findById(
             mediaId
         );
 
     if (
         !media ||
-        media.testCaseId !== testCaseId
+        media.questionId !== questionId
     ) {
         throw new ApiError(
             404,
-            "Test case media not found",
-            "TEST_CASE_MEDIA_NOT_FOUND"
+            "Question media not found",
+            "QUESTION_MEDIA_NOT_FOUND"
         );
     }
 
@@ -158,25 +158,25 @@ const getTestCaseMediaById = async (
 // GET ALL MEDIA
 // =====================================================
 
-const getTestCaseMedias = async (
-    testCaseId
+const getQuestionMedias = async (
+    questionId
 ) => {
-    const testCase =
-        await testCaseRepository.findById(
-            testCaseId
+    const question =
+        await questionRepository.findQuestionById(
+            questionId
         );
 
-    if (!testCase) {
+    if (!question) {
         throw new ApiError(
             404,
-            "Test case not found",
-            "TEST_CASE_NOT_FOUND"
+            "Question not found",
+            "QUESTION_NOT_FOUND"
         );
     }
 
 
-    return testCaseMediaRepository
-        .findByTestCaseId(testCaseId);
+    return questionMediaRepository
+        .findByQuestionId(questionId);
 };
 
 
@@ -184,39 +184,39 @@ const getTestCaseMedias = async (
 // UPDATE MEDIA
 // =====================================================
 
-const updateTestCaseMedia = async (
-    testCaseId,
+const updateQuestionMedia = async (
+    questionId,
     mediaId,
     data,
     file
 ) => {
-    const testCase =
-        await testCaseRepository.findById(
-            testCaseId
+    const question =
+        await questionRepository.findQuestionById(
+            questionId
         );
 
-    if (!testCase) {
+    if (!question) {
         throw new ApiError(
             404,
-            "Test case not found",
-            "TEST_CASE_NOT_FOUND"
+            "Question not found",
+            "QUESTION_NOT_FOUND"
         );
     }
 
 
     const existingMedia =
-        await testCaseMediaRepository.findById(
+        await questionMediaRepository.findById(
             mediaId
         );
 
     if (
         !existingMedia ||
-        existingMedia.testCaseId !== testCaseId
+        existingMedia.questionId !== questionId
     ) {
         throw new ApiError(
             404,
-            "Test case media not found",
-            "TEST_CASE_MEDIA_NOT_FOUND"
+            "Question media not found",
+            "QUESTION_MEDIA_NOT_FOUND"
         );
     }
 
@@ -238,9 +238,9 @@ const updateTestCaseMedia = async (
             existingMedia.displayOrder
     ) {
         const conflictingMedia =
-            await testCaseMediaRepository
-                .findByTestCaseAndDisplayOrder(
-                    testCaseId,
+            await questionMediaRepository
+                .findByQuestionAndDisplayOrder(
+                    questionId,
                     data.displayOrder,
                     mediaId
                 );
@@ -249,7 +249,7 @@ const updateTestCaseMedia = async (
             throw new ApiError(
                 409,
                 "Display order is already used by another media item",
-                "TEST_CASE_MEDIA_DISPLAY_ORDER_EXISTS"
+                "QUESTION_MEDIA_DISPLAY_ORDER_EXISTS"
             );
         }
     }
@@ -265,10 +265,9 @@ const updateTestCaseMedia = async (
         let uploaded;
 
         try {
-            uploaded =
-                await uploadImage(
+            uploaded = await uploadImage(
                     file,
-                    "assessment-platform/test-case-media"
+                    "assessment-platform/question-media"
                 );
         } catch (error) {
             throw new ApiError(
@@ -290,7 +289,6 @@ const updateTestCaseMedia = async (
             } catch (error) {
                 // New file was successfully uploaded,
                 // so don't fail the update because cleanup failed.
-                // The old file may need later cleanup.
             }
         }
     }
@@ -310,7 +308,7 @@ const updateTestCaseMedia = async (
     }
 
 
-    return testCaseMediaRepository.update(
+    return questionMediaRepository.update(
         mediaId,
         updateData
     );
@@ -321,37 +319,37 @@ const updateTestCaseMedia = async (
 // DELETE MEDIA
 // =====================================================
 
-const deleteTestCaseMedia = async (
-    testCaseId,
+const deleteQuestionMedia = async (
+    questionId,
     mediaId
 ) => {
-    const testCase =
-        await testCaseRepository.findById(
-            testCaseId
+    const question =
+        await questionRepository.findQuestionById(
+            questionId
         );
 
-    if (!testCase) {
+    if (!question) {
         throw new ApiError(
             404,
-            "Test case not found",
-            "TEST_CASE_NOT_FOUND"
+            "Question not found",
+            "QUESTION_NOT_FOUND"
         );
     }
 
 
     const existingMedia =
-        await testCaseMediaRepository.findById(
+        await questionMediaRepository.findById(
             mediaId
         );
 
     if (
         !existingMedia ||
-        existingMedia.testCaseId !== testCaseId
+        existingMedia.questionId !== questionId
     ) {
         throw new ApiError(
             404,
-            "Test case media not found",
-            "TEST_CASE_MEDIA_NOT_FOUND"
+            "Question media not found",
+            "QUESTION_MEDIA_NOT_FOUND"
         );
     }
 
@@ -373,16 +371,16 @@ const deleteTestCaseMedia = async (
     }
 
 
-    await testCaseMediaRepository.remove(
+    await questionMediaRepository.remove(
         mediaId
     );
 };
 
 
 module.exports = {
-    createTestCaseMedia,
-    getTestCaseMediaById,
-    getTestCaseMedias,
-    updateTestCaseMedia,
-    deleteTestCaseMedia
+    createQuestionMedia,
+    getQuestionMediaById,
+    getQuestionMedias,
+    updateQuestionMedia,
+    deleteQuestionMedia
 };
