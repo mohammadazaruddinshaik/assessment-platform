@@ -4,14 +4,19 @@ const questionRoutes = require("../modules/question/question.routes");
 const categoryRoutes = require("../modules/category/category.routes");
 const tagRoutes = require("../modules/tag/tag.routes");
 const languageRoutes = require("../modules/language/language.routes");
+const testCaseRoutes = require("../modules/test-case/test-case.routes");
+const testCaseMediaRoutes = require("../modules/test-case-media/test-case-media.routes");
 
 const router = express.Router();
+
+// question module 
 
 router.use("/questions", questionRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/tags", tagRoutes);
 router.use("/languages", languageRoutes);
-
+router.use("/test-cases", testCaseRoutes);
+router.use("/test-cases", testCaseMediaRoutes);
 
 
 module.exports = router;
