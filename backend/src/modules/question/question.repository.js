@@ -144,6 +144,10 @@ const findQuestionById = async (id) => {
             },
 
             select: {
+                // =================================================
+                // QUESTION
+                // =================================================
+
                 id: true,
                 categoryId: true,
                 title: true,
@@ -157,9 +161,10 @@ const findQuestionById = async (id) => {
                 createdAt: true,
                 updatedAt: true,
 
-                // -----------------------------
-                // Category
-                // -----------------------------
+
+                // =================================================
+                // CATEGORY
+                // =================================================
 
                 category: {
                     select: {
@@ -170,9 +175,10 @@ const findQuestionById = async (id) => {
                     }
                 },
 
-                // -----------------------------
-                // Tags
-                // -----------------------------
+
+                // =================================================
+                // TAGS
+                // =================================================
 
                 tags: {
                     select: {
@@ -187,9 +193,10 @@ const findQuestionById = async (id) => {
                     }
                 },
 
-                // -----------------------------
-                // Languages
-                // -----------------------------
+
+                // =================================================
+                // LANGUAGES
+                // =================================================
 
                 languages: {
                     select: {
@@ -205,13 +212,98 @@ const findQuestionById = async (id) => {
                             }
                         }
                     }
+                },
+
+
+                // =================================================
+                // QUESTION MEDIA
+                // =================================================
+
+                media: {
+                    orderBy: {
+                        displayOrder: "asc"
+                    },
+
+                    select: {
+                        id: true,
+                        type: true,
+                        url: true,
+                        publicId: true,
+                        altText: true,
+                        displayOrder: true,
+                        createdAt: true,
+                        updatedAt: true
+                    }
+                },
+
+
+                // =================================================
+                // CODING CONFIG
+                // =================================================
+
+                codingConfig: {
+                    select: {
+                        id: true,
+                        executionMode: true,
+                        timeLimitMs: true,
+                        memoryLimitMb: true,
+                        createdAt: true,
+                        updatedAt: true
+                    }
+                },
+
+
+                // =================================================
+                // TEST CASES
+                // =================================================
+
+                testCases: {
+                    orderBy: {
+                        displayOrder: "asc"
+                    },
+
+                    select: {
+                        id: true,
+                        input: true,
+                        expectedOutput: true,
+                        explanation: true,
+                        isSample: true,
+                        points: true,
+                        displayOrder: true,
+                        createdAt: true,
+                        updatedAt: true,
+
+
+                        // =========================================
+                        // TEST CASE MEDIA
+                        // =========================================
+
+                        media: {
+                            orderBy: {
+                                displayOrder: "asc"
+                            },
+
+                            select: {
+                                id: true,
+                                type: true,
+                                url: true,
+                                publicId: true,
+                                altText: true,
+                                displayOrder: true,
+                                createdAt: true,
+                                updatedAt: true
+                            }
+                        }
+                    }
                 }
             }
         });
 
+
     if (!question) {
         return null;
     }
+
 
     return {
         ...question,
@@ -234,7 +326,6 @@ const findQuestionById = async (id) => {
             )
     };
 };
-
 
 // =====================================================
 // LIST QUESTIONS
